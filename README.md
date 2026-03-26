@@ -1,4 +1,4 @@
-# CareLink – Midwifery Service Database System
+# MaternaDB – Midwifery Service Database System
 
 A Java-based healthcare database application designed to support maternal care workflows, including appointment management, clinical documentation, and diagnostic tracking.
 
