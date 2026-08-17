@@ -4,7 +4,7 @@ A Java-based healthcare database application designed to support maternal care w
 
 ---
 
-## 🚀 Features
+## Features
 
 - Query midwives and scheduled appointments by date  
 - View patient-specific appointment details  
@@ -15,7 +15,7 @@ A Java-based healthcare database application designed to support maternal care w
 
 ---
 
-## 🏗️ System Overview
+## System Overview
 
 The application connects to a **DB2 relational database** using JDBC and enables real-time interaction with structured healthcare data.
 
@@ -40,7 +40,7 @@ The system models real-world healthcare entities such as:
 
 ---
 
-## 🔄 Example Workflow
+## Example Workflow
 
 1. Enter practitioner ID  
 2. Select appointment date  
@@ -56,7 +56,7 @@ This workflow simulates real-world clinical interaction with patient records.
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - **Java**
 - **JDBC**
@@ -65,7 +65,7 @@ This workflow simulates real-world clinical interaction with patient records.
 
 ---
 
-## ▶️ How to Run
+## How to Run
 
 1. Configure DB2 credentials in `goBabbyApp.java`  
 2. Compile and run:
