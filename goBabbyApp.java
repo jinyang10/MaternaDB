@@ -11,31 +11,8 @@ public class goBabbyApp {
         int sqlCode=0;      // Variable to hold SQLCODE
         String sqlState="00000";  // Variable to hold SQLSTATE
 
-        // Register the driver
-        try { DriverManager.registerDriver ( new com.ibm.db2.jcc.DB2Driver() ) ; }
-        catch (Exception cnfe){ System.out.println("Class not found"); }
-
-        // This is the url you must use for DB2.
-        //Note: This url may not valid now ! Check for the correct year and semester and server name.
-        String url = "jdbc:db2://winter2022-comp421.cs.mcgill.ca:50000/cs421";
-
-        //user id, password for login to DB2
-        String your_userid = "";
-        String your_password = "";
-        //AS AN ALTERNATIVE, you can just set your password in the shell environment in the Unix (as shown below) and read it from there.
-        //$  export SOCSPASSWD=yoursocspasswd
-        if(your_userid == null && (your_userid = System.getenv("SOCSUSER")) == null)
-        {
-            System.err.println("Error!! do not have a password to connect to the database!");
-            System.exit(1);
-        }
-        if(your_password == null && (your_password = System.getenv("SOCSPASSWD")) == null)
-        {
-            System.err.println("Error!! do not have a password to connect to the database!");
-            System.exit(1);
-        }
-        Connection con = DriverManager.getConnection (url,your_userid,your_password) ;
-        Statement statement = con.createStatement () ;
+        Connection con = openConnection();
+        Statement statement = con.createStatement();
 
         // get midwife's practitioner ID
         int flag = 0;
@@ -94,8 +71,7 @@ public class goBabbyApp {
             if (!optionFive || optionD) {
                 optionD = false;
                 System.out.print("Enter the date (YYYY-MM-DD) for appointment list [E] to exit: ");
-                Scanner scanner = new Scanner(System.in);
-                appDate = scanner.nextLine();
+                appDate = sc.nextLine();
                 if (appDate.equals("E")) {
                     con.close();
                     return;
@@ -118,7 +94,7 @@ public class goBabbyApp {
                 while (rs.next()) {
                     // an appointment for the Date has been found; update flag
                     flag = 1;
-                    Time appTime = rs.getTime("ATIME");
+                    String appTime = normalizeTime(rs.getString("ATIME"));
                     Boolean primary = rs.getBoolean("is_primary");
                     String isPrimary = "";
                     if (primary) {
@@ -160,8 +136,7 @@ public class goBabbyApp {
                     //get user input for Appointment Option E, D, or Appointment Number
                     System.out.println("Enter the appointment number you'd like to work on.");
                     System.out.print("\t" + "[E] to exit [D] to go back to another date: ");
-                    Scanner sc2 = new Scanner(System.in);
-                    appNumber = sc2.nextLine();
+                    appNumber = sc.nextLine();
                     try {
                         int appNum = Integer.parseInt(appNumber);
                         if (appNum > appMothers.size() || appNum == 0 ) {
@@ -180,8 +155,13 @@ public class goBabbyApp {
                             System.out.println("4. Prescribe a test");
                             System.out.println("5. Go back to the appointments."); System.out.println("");
                             System.out.print("Enter your choice: ");
-                            Scanner sc3 = new Scanner(System.in);
-                            int option = sc3.nextInt();
+                            int option;
+                            try {
+                                option = Integer.parseInt(sc.nextLine().trim());
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid option..");
+                                continue;
+                            }
 
                             // list ALL NOTES relevant for this pregnancy, in descending order of Date Time
                             // then display the MENU with 5 options again
@@ -193,14 +173,14 @@ public class goBabbyApp {
                                             "WHERE amw.PRACID = " + "'" + pId + "'" + "AND app.ADATE = " +
                                             "'" + appDate + "'" + " AND c.QCHCN = " + "'" + hcn + "'" +
                                             "AND c.CID = app.CID) " +
-                                            "SELECT Distinct ADATE, NTIME, LEFT(OBSERV, 50) OBSERVE " +
+                                            "SELECT Distinct ADATE, NTIME, SUBSTR(OBSERV, 1, 50) OBSERVE " +
                                             "FROM APPOINTMENTS app, mwInfo mwI, NOTES n " +
                                             "WHERE app.NTHPREG = mwI.nthpreg AND app.CID = mwI.cid " +
                                             "AND app.APPOINTID = n.APPOINTID ORDER BY ADATE DESC, NTIME DESC";
                                     java.sql.ResultSet rsNotes = statement.executeQuery(noteQuery);
                                     while (rsNotes.next()) {
-                                        Date date = rsNotes.getDate("ADATE");
-                                        Time time = rsNotes.getTime("NTIME");
+                                        String date = rsNotes.getString("ADATE");
+                                        String time = rsNotes.getString("NTIME");
                                         String obs = rsNotes.getString("OBSERVE");
                                         System.out.println(date + " " + time + " " + obs);
                                     }
@@ -225,13 +205,13 @@ public class goBabbyApp {
                                             "'" + appDate + "'" + " AND c.QCHCN = " + "'" + hcn + "'" +
                                             "AND c.CID = app.CID) " +
                                             "SELECT Distinct PRESCDATE, TESTTYPE, " +
-                                            "COALESCE(LEFT(RESULT, 50), 'PENDING') as RESULT " +
+                                            "COALESCE(SUBSTR(RESULT, 1, 50), 'PENDING') as RESULT " +
                                             "FROM APPOINTMENTS app, mwInfo mwI, TESTS t " +
                                             "WHERE app.NTHPREG = mwI.nthpreg AND app.CID = mwI.cid " +
                                             "AND app.APPOINTID = t.APPOINTID ORDER BY PRESCDATE DESC";
                                     java.sql.ResultSet rsTests = statement.executeQuery(testQuery);
                                     while (rsTests.next()) {
-                                        Date date = rsTests.getDate("PRESCDATE");
+                                        String date = rsTests.getString("PRESCDATE");
                                         String ttype = rsTests.getString("TESTTYPE");
                                         String result = rsTests.getString("RESULT");
                                         System.out.println(date + " " + "[" + ttype + "]" + " " + result);
@@ -251,18 +231,17 @@ public class goBabbyApp {
                                 String time = arr[0];
                                 String hcn = arr[3];
                                 System.out.print("Type your observation: ");
-                                Scanner sc4 = new Scanner(System.in);
-                                String userObs = sc4.nextLine();
+                                String userObs = sc.nextLine();
                                 try {
                                     String insertNoteQuery = "INSERT INTO NOTES " +
-                                            "(SELECT CURRENT_TIME, APPOINTID, " + "'" + userObs + "' " +
+                                            "SELECT CURRENT_TIME, APPOINTID, " + "'" + userObs + "' " +
                                             "FROM APPOINTMENTS app, COUPLE c, MOTHERS m " +
                                             "WHERE (app.NTHPREG, app.CID) IN (SELECT NTHPREG, CID FROM ASSIGNEDMW amw " +
                                             "WHERE amw.PRACID = " + "'" + pId + "') AND app.CID = c.CID AND " +
-                                            "app.ADATE = " + "'" + appDate + "'" + "AND " +
+                                            "app.ADATE = " + "'" + appDate + "'" + " AND " +
                                             "c.QCHCN = m.QCHCN AND c.QCHCN = " + "'" + hcn + "' " +
                                             "AND m.QCHCN = " + "'" + hcn + "' " + "AND app.ATIME = " + "'" +
-                                            time + "' )";
+                                            time + "'";
                                     statement.executeUpdate(insertNoteQuery);
                                 } catch (SQLException e) {
                                     sqlCode = e.getErrorCode(); // Get SQLCODE
@@ -278,17 +257,14 @@ public class goBabbyApp {
                                 String time = arr[0];
                                 String hcn = arr[3];
                                 System.out.print("Enter the type of test: ");
-                                Scanner sc4 = new Scanner(System.in);
-                                String userTypeTest = sc4.nextLine();
+                                String userTypeTest = sc.nextLine();
                                 System.out.print("Enter testID: ");
-                                Scanner sc5 = new Scanner(System.in);
-                                String userTestId = sc5.nextLine();
+                                String userTestId = sc.nextLine();
                                 System.out.print("Enter techID: ");
-                                Scanner sc6 = new Scanner(System.in);
-                                String userTechId = sc6.nextLine();
+                                String userTechId = sc.nextLine();
                                 try {
                                     String insertTest = "INSERT INTO TESTS " +
-                                            "(SELECT " + "'" + userTestId + "', " + "'" + userTechId + "', " + "APPOINTID, " +
+                                            "SELECT " + "'" + userTestId + "', " + "'" + userTechId + "', " + "APPOINTID, " +
                                             "CURRENT_DATE, CURRENT_DATE, " + "'" + userTypeTest + "'," + " NULL, NULL " +
                                             "FROM APPOINTMENTS app, COUPLE c, MOTHERS m " +
                                             "WHERE (app.NTHPREG, app.CID) IN (SELECT NTHPREG, CID FROM ASSIGNEDMW amw " +
@@ -296,7 +272,7 @@ public class goBabbyApp {
                                             "app.ADATE = " + "'" + appDate + "' " + "AND " +
                                             "c.QCHCN = m.QCHCN AND c.QCHCN = " + "'" + hcn + "' " +
                                             "AND m.QCHCN = " + "'" + hcn + "' " + "AND app.ATIME = " + "'" +
-                                            time + "')";
+                                            time + "'";
                                     statement.executeUpdate(insertTest);
 
                                 } catch (SQLException e) {
@@ -344,5 +320,80 @@ public class goBabbyApp {
         // Finally close the statement and connection
         statement.close ( ) ;
         con.close ( ) ;
+    }
+
+    /**
+     * Connect using JDBC_URL / DATABASE_URL, with optional JDBC_USER and JDBC_PASSWORD.
+     * McGill COMP 421 originally used IBM DB2; this now also supports PostgreSQL and SQLite.
+     */
+    static Connection openConnection() throws SQLException {
+        String url = firstEnv("JDBC_URL", "DATABASE_URL");
+        if (url.isEmpty()) {
+            url = "jdbc:sqlite:materna.db";
+            System.err.println("No JDBC_URL/DATABASE_URL set; using local SQLite file materna.db");
+        }
+        url = toJdbcUrl(url);
+
+        String userid = firstEnv("JDBC_USER", "SOCSUSER");
+        String password = firstEnv("JDBC_PASSWORD", "SOCSPASSWD");
+
+        registerDriver(url);
+
+        if (userid.isEmpty() && password.isEmpty()) {
+            return DriverManager.getConnection(url);
+        }
+        return DriverManager.getConnection(url, userid, password);
+    }
+
+    static String firstEnv(String... keys) {
+        for (String key : keys) {
+            String value = System.getenv(key);
+            if (value != null && !value.trim().isEmpty()) {
+                return value.trim();
+            }
+        }
+        return "";
+    }
+
+    static String toJdbcUrl(String url) {
+        if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
+            return "jdbc:postgresql://" + url.substring(url.indexOf("://") + 3);
+        }
+        return url;
+    }
+
+    static String normalizeTime(String raw) {
+        if (raw == null) {
+            return "";
+        }
+        String timePart = raw;
+        int space = raw.indexOf(' ');
+        if (space >= 0 && space + 1 < raw.length()) {
+            timePart = raw.substring(space + 1);
+        }
+        if (timePart.length() >= 8 && timePart.charAt(2) == ':') {
+            return timePart.substring(0, 8);
+        }
+        return timePart;
+    }
+
+    static void registerDriver(String url) {
+        String className;
+        if (url.startsWith("jdbc:db2:")) {
+            className = "com.ibm.db2.jcc.DB2Driver";
+        } else if (url.startsWith("jdbc:postgresql:")) {
+            className = "org.postgresql.Driver";
+        } else if (url.startsWith("jdbc:sqlite:")) {
+            className = "org.sqlite.JDBC";
+        } else {
+            return;
+        }
+        try {
+            Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            System.err.println("JDBC driver not found on the classpath: " + className);
+            System.err.println("Download the matching driver JAR (see README) and include it with -cp.");
+            System.exit(1);
+        }
     }
 }

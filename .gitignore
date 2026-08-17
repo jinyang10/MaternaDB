@@ -1,0 +1,7 @@
+*.class
+*.db
+.env
+lib/*.jar
+/P3/
+.idea/
+*.iml
