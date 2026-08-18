@@ -42,7 +42,6 @@ Credentials are read from the environment (never hard-code passwords):
 | `JDBC_URL` or `DATABASE_URL` | JDBC or `postgres://` URL |
 | `JDBC_USER` | User (optional if the URL already contains it) |
 | `JDBC_PASSWORD` | Password |
-| `SOCSUSER` / `SOCSPASSWD` |
 
 If `JDBC_URL` is unset, the app uses a local file **`materna.db`** (SQLite). That is the fastest free option.
 
