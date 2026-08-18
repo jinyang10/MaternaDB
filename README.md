@@ -48,11 +48,26 @@ If `JDBC_URL` is unset, the app uses a local file **`materna.db`** (SQLite). Tha
 ### 1. Local SQLite (no account)
 
 ```bash
+bash scripts/run.sh
+```
+
+That script compiles `InitDb.java` / `goBabbyApp.java` into the `P3/` folder (the files declare `package P3;`) and uses `;` on Windows Git Bash vs `:` on Linux/macOS. Copy-pasting `java -cp "lib/*:." P3.InitDb` in Git Bash fails with `ClassNotFoundException: P3.InitDb` because Windows `java.exe` does not split classpaths on `:`.
+
+Manual commands (Linux/macOS):
+
+```bash
 bash scripts/download-drivers.sh
 javac -cp "lib/*:." -d . InitDb.java goBabbyApp.java
 java -cp "lib/*:." P3.InitDb          # creates materna.db and loads sample rows
 java -cp "lib/*:." P3.goBabbyApp
-# or: bash scripts/run.sh
+```
+
+On Windows CMD or Git Bash, use `;` instead of `:`:
+
+```bat
+javac -cp "lib/*;." -d . InitDb.java goBabbyApp.java
+java -cp "lib/*;." P3.InitDb
+java -cp "lib/*;." P3.goBabbyApp
 ```
 
 Try practitioner **`MW001`** and date **`2026-03-15`**. When prescribing a test, use technician id **`T001`**.
