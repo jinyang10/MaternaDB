@@ -6,6 +6,16 @@ Repo now connects to **SQLite** (local file, no account) or **PostgreSQL** (free
 
 ---
 
+## Features
+
+- Query midwives and scheduled appointments by date
+- View patient-specific appointment details
+- Review clinical notes and diagnostic test results
+- Add new observations (notes) to appointments
+- Prescribe diagnostic tests linked to patient records
+
+---
+
 ### Tables this app actually queries
 
 Column names in the Java SQL are the DB2 names (shown in uppercase in queries):
@@ -129,16 +139,6 @@ export JDBC_PASSWORD='postgres'
 java -cp "lib/*:." P3.InitDb
 java -cp "lib/*:." P3.goBabbyApp
 ```
----
-
-## Features
-
-- Query midwives and scheduled appointments by date
-- View patient-specific appointment details
-- Review clinical notes and diagnostic test results
-- Add new observations (notes) to appointments
-- Prescribe diagnostic tests linked to patient records
-
 ---
 
 ## Technologies
