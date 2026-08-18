@@ -47,13 +47,15 @@ If `JDBC_URL` is unset, the app uses a local file **`materna.db`** (SQLite). Tha
 
 ### 1. Local SQLite (no account)
 
-On **Windows**, do not copy-paste `java -cp "lib/*:." ...`. Windows `java.exe` needs `;` in the classpath, and Git Bash often mangles `-cp`, which produces `ClassNotFoundException: P3.InitDb` even when `P3/InitDb.class` exists.
+On **Windows**, do not copy-paste `java -cp "lib/*:." ...`. That Unix classpath makes Windows Java report `ClassNotFoundException: P3.InitDb` even when `P3/InitDb.class` exists.
+
+From **Command Prompt** (including if Git Bash dropped you into `C:\Users\...>`):
 
 ```bat
 scripts\run.cmd
 ```
 
-Or from Git Bash (`scripts/run.sh` forwards to `run.cmd` on Windows):
+From **Git Bash** (stays in bash; does not open `cmd.exe`):
 
 ```bash
 bash scripts/run.sh
