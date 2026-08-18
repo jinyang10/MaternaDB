@@ -30,8 +30,6 @@ Column names in the Java SQL are the DB2 names (shown in uppercase in queries):
 | `NOTES` | Observation text (`OBSERV`) and note time (`NTIME`) |
 | `TESTS` | Prescribed tests (`TESTTYPE`, `PRESCDATE`, `RESULT`) |
 
-`info.pdf` lists a larger model (fathers, institutions, info sessions, babies, technicians). The console app only needs the tables above.
-
 ### Console workflow 
 
 1. Enter a practitioner id (or `E` to exit).
