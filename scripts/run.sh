@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Compile and run the console app.
+# Compile and run the Swing app.
 #
 # Git Bash on Windows launches Windows java.exe:
 #   - ':' in -cp is not a classpath separator, so P3.InitDb is not found
@@ -33,9 +33,9 @@ if [[ ! -f lib/sqlite-jdbc.jar || ! -f lib/postgresql.jar ]]; then
 fi
 
 # JDBC drivers are runtime-only; javac does not need them on the classpath.
-javac -d . InitDb.java goBabbyApp.java
+javac -d . InitDb.java goBabbyApp.java MaternaDb.java MaternaApp.java
 
-if [[ ! -f P3/InitDb.class || ! -f P3/goBabbyApp.class ]]; then
+if [[ ! -f P3/InitDb.class || ! -f P3/MaternaApp.class ]]; then
   echo "javac did not write P3/*.class. The sources use 'package P3;' so -d . must create that folder." >&2
   exit 1
 fi
@@ -62,11 +62,11 @@ if [[ "$windows" -eq 1 ]]; then
   if [[ ! -f materna.db && -z "${JDBC_URL:-}" && -z "${DATABASE_URL:-}" ]]; then
     run_java P3.InitDb
   fi
-  exec java P3.goBabbyApp
+  exec java P3.MaternaApp
 fi
 
 CP="lib/postgresql.jar:lib/sqlite-jdbc.jar:."
 if [[ ! -f materna.db && -z "${JDBC_URL:-}" && -z "${DATABASE_URL:-}" ]]; then
   java -cp "$CP" P3.InitDb
 fi
-exec java -cp "$CP" P3.goBabbyApp
+exec java -cp "$CP" P3.MaternaApp

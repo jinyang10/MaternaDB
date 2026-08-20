@@ -1,6 +1,6 @@
 # MaternaDB – Midwifery Service Database System
 
-A Java console app that talks to a relational database over JDBC so a midwife can look up appointments, read notes and tests, add an observation, and prescribe a test.
+A Java **Swing** desktop app (plus the original console program) that talks to a relational database over JDBC so a midwife can look up appointments, read notes and tests, add an observation, and prescribe a test.
 
 Repo now connects to **SQLite** (local file, no account) or **PostgreSQL** (free hosted databases such as Neon or Supabase).
 
@@ -8,6 +8,7 @@ Repo now connects to **SQLite** (local file, no account) or **PostgreSQL** (free
 
 ## Features
 
+- Desktop Swing workspace for login, appointments, notes, and tests
 - Query midwives and scheduled appointments by date
 - View patient-specific appointment details
 - Review clinical notes and diagnostic test results
@@ -30,12 +31,11 @@ Column names in the Java SQL are the DB2 names (shown in uppercase in queries):
 | `NOTES` | Observation text (`OBSERV`) and note time (`NTIME`) |
 | `TESTS` | Prescribed tests (`TESTTYPE`, `PRESCDATE`, `RESULT`) |
 
-### Console workflow 
+### App workflow
 
-1. Enter a practitioner id (or `E` to exit).
-2. Enter a date `YYYY-MM-DD`. The app lists that midwife’s appointments, ordered by time, with `P` (primary) or `B` (backup), mother name, and health card number.
-3. Pick an appointment number, or `D` for another date.
-4. For that visit: review notes, review tests, add a note, or prescribe a test.
+1. Sign in with a practitioner id.
+2. Load a date `YYYY-MM-DD`. The table lists that midwife’s appointments, ordered by time, with `P` (primary) or `B` (backup), mother name, and health card number.
+3. Select a visit to review notes, review tests, add a note, or prescribe a test.
 
 Adding a note inserts `(CURRENT_TIME, APPOINTID, observation)` into `NOTES`. Prescribing a test inserts a row into `TESTS` with today’s date and a `NULL` result (shown as `PENDING`).
 
@@ -79,20 +79,27 @@ Manual commands (Linux/macOS):
 
 ```bash
 bash scripts/download-drivers.sh
-javac -d . InitDb.java goBabbyApp.java
+javac -d . InitDb.java goBabbyApp.java MaternaDb.java MaternaApp.java
 java -cp "lib/*:." P3.InitDb          # creates materna.db and loads sample rows
-java -cp "lib/*:." P3.goBabbyApp
+java -cp "lib/*:." P3.MaternaApp
 ```
 
 Manual commands (Windows CMD):
 
 ```bat
-javac -d . InitDb.java goBabbyApp.java
+javac -d . InitDb.java goBabbyApp.java MaternaDb.java MaternaApp.java
 java -cp "lib\*;." P3.InitDb
-java -cp "lib\*;." P3.goBabbyApp
+java -cp "lib\*;." P3.MaternaApp
 ```
 
-Try practitioner **`MW001`** and date **`2026-03-15`**. When prescribing a test, use technician id **`T001`**.
+A window opens. Sign in as **`MW001`**, keep date **`2026-03-15`**, and click **Load**. When prescribing a test, use technician id **`T001`** and any unused test id (for example `TST03`).
+
+The original console program is still there:
+
+```bash
+java -cp "lib/*:." P3.goBabbyApp          # Linux/macOS
+java -cp "lib\*;." P3.goBabbyApp          # Windows
+```
 
 ### 2. Free hosted PostgreSQL (Neon or Supabase)
 
@@ -115,7 +122,7 @@ Try practitioner **`MW001`** and date **`2026-03-15`**. When prescribing a test,
    ```bash
    export DATABASE_URL='postgres://USER:PASS@HOST/db?sslmode=require'
    java -cp "lib/*:." P3.InitDb
-   java -cp "lib/*:." P3.goBabbyApp
+   java -cp "lib/*:." P3.MaternaApp
    ```
 
 4. Example env vars (see `env.example`):
@@ -135,13 +142,13 @@ export JDBC_URL='jdbc:postgresql://localhost:5432/materna'
 export JDBC_USER='postgres'
 export JDBC_PASSWORD='postgres'
 java -cp "lib/*:." P3.InitDb
-java -cp "lib/*:." P3.goBabbyApp
+java -cp "lib/*:." P3.MaternaApp
 ```
 ---
 
 ## Technologies
 
-- Java
+- Java (Swing UI, optional console)
 - JDBC (PostgreSQL, SQLite, or DB2)
 - SQL
 
