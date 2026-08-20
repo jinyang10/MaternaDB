@@ -39,6 +39,38 @@ Column names in the Java SQL are the DB2 names (shown in uppercase in queries):
 
 Adding a note inserts `(CURRENT_TIME, APPOINTID, observation)` into `NOTES`. Prescribing a test inserts a row into `TESTS` with today’s date and a `NULL` result (shown as `PENDING`).
 
+The original Java assignment did **not** include screens to register a mother or book an appointment. Those rows live in the database (`sql/seed.sql`). The program was written for a midwife at the clinic desk: look up today’s list, read the chart, add a note, prescribe a test. Reception / admin work (new mothers, new bookings) was assumed to already be in DB2.
+
+---
+
+## Sample data to try
+
+After a fresh load (`P3.InitDb`), sign in and click **Load** for each date below.
+
+Delete `materna.db` first if you already ran the app once, then `bash scripts/run.sh` so the new rows are loaded.
+
+| Sign in | Date | What you should see |
+| --- | --- | --- |
+| `MW001` | `2026-03-15` | Alice Smith **P** 09:30, Carol Jones **B** 11:15, Alice **P** 14:00, Dana Patel **P** 16:00 |
+| `MW001` | `2026-03-22` | Dana **P** 08:45, Alice **P** 10:00, Carol **B** 13:30, Elena Rossi **B** 15:00 |
+| `MW001` | `2026-04-02` | Alice **P** 09:15, Fatima Hassan **P** 11:00, Dana **P** 14:30 |
+| `MW001` | `2026-04-10` | Elena **B** 09:45, Carol **B** 11:00, Fatima **P** 13:15 |
+| `MW002` | `2026-03-15` | Same four visits, but Alice/Dana are **B** and Carol is **P** |
+| `MW002` | `2026-04-10` | Elena **P** 09:45, Carol **P** 11:00, Fatima **B** 13:15 |
+
+Open a visit and check **Notes** / **Tests**:
+
+| Mother | Health card | Useful checks |
+| --- | --- | --- |
+| Alice Smith | `HCN001` | Several prenatal notes; blood work result “iron slightly low”; glucose still `PENDING` |
+| Carol Jones | `HCN002` | Backup check-in note; urine dip “trace protein” on 2026-03-22 |
+| Dana Patel | `HCN003` | Intake notes (penicillin allergy); blood type `A+` |
+| Elena Rossi | `HCN004` | Transfer-of-care note; GBS swab `PENDING` |
+| Fatima Hassan | `HCN005` | First-visit notes; no tests yet — prescribe one with tech `T001` |
+
+When prescribing a test, use technician **`T001`** or **`T002`** and a new test id (for example `TST10`).
+
+
 ---
 
 ## Connect to another free database
@@ -92,7 +124,7 @@ java -cp "lib\*;." P3.InitDb
 java -cp "lib\*;." P3.MaternaApp
 ```
 
-A window opens. Sign in as **`MW001`**, keep date **`2026-03-15`**, and click **Load**. When prescribing a test, use technician id **`T001`** and any unused test id (for example `TST03`).
+A window opens. Use the [sample data table](#sample-data-to-try) (start with **`MW001`** and **`2026-03-15`**).
 
 The original console program is still there:
 

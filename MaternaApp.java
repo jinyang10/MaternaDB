@@ -167,7 +167,7 @@ public class MaternaApp {
         signIn.addActionListener(e -> signIn());
         pracField.addActionListener(e -> signIn());
 
-        JLabel hint = label("Try MW001, then date 2026-03-15.", SMALL, MUTED);
+        JLabel hint = label("See README for sample IDs, dates, and mothers.", SMALL, MUTED);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
