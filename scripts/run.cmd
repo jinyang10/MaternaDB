@@ -20,11 +20,11 @@ if errorlevel 1 exit /b 1
 
 :compile
 rem JDBC jars are needed at runtime only.
-javac -d . InitDb.java goBabbyApp.java
+javac -d . InitDb.java goBabbyApp.java MaternaDb.java MaternaApp.java
 if errorlevel 1 exit /b 1
 
-if not exist P3\InitDb.class (
-  echo javac did not write P3\InitDb.class
+if not exist P3\MaternaApp.class (
+  echo javac did not write P3\MaternaApp.class
   exit /b 1
 )
 
@@ -42,5 +42,5 @@ if errorlevel 1 (
 )
 
 :runapp
-java P3.goBabbyApp
+java P3.MaternaApp
 exit /b %ERRORLEVEL%
