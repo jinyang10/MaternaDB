@@ -1,3 +1,5 @@
+![MaternaDB](maternadb.jpg)
+
 # MaternaDB – Midwifery Service Database System
 
 A Java **Swing** desktop app (plus the original console program) that talks to a relational database over JDBC so a midwife can look up appointments, read notes and tests, add an observation, and prescribe a test.
